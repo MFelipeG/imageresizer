@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Resize your images online for free with Image Resizer. Choose predefined sizes like 192x192, 512x512, or customize dimensions.">
+    <meta name="keywords" content="resize image, image resizer online, 192x192, 512x512, resize free, Image Resizer">
+    <meta name="author" content="MFelipeG">
+    <meta name="robots" content="index, follow">
+    <title>Image Resizer - Resize Images Online for Free</title>
+    <link rel="manifest" href="/manifest.json">
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8442042587705069" crossorigin="anonymous"></script>
+    <!-- JSZip and FileSaver for ZIP download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        nav {
+            width: 100%;
+            max-width: 1200px;
+            text-align: right;
+            padding: 10px 0;
+        }
+        nav a {
+            margin-left: 15px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .ad-space-top {
+            width: 100%;
+            max-width: 728px;
+            min-height: 90px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .main-content {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        select, input[type="file"], input[type="number"], input[type="range"] {
+            display: block;
+            margin: 15px auto;
+            padding: 10px;
+            width: 80%;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        input[type="file"] {
+            border-style: dashed;
+        }
+        input[type="file"]::-webkit-file-upload-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #27ae60;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+        #preview, #resizedPreview {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        #output {
+            margin-top: 20px;
+            display: none;
+        }
+        #output a {
+            display: block;
+            margin: 10px 0;
+            color: #3498db;
+            text-decoration: none;
+        }
+        p {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 15px;
+        }
+        .custom-size {
+            display: none;
+        }
+        .ad-space-side {
+            width: 160px;
+            min-height: 600px;
+            margin-left: 20px;
+            display: none;
+        }
+        label {
+            font-size: 14px;
+            color: #2c3e50;
+            margin: 5px 0;
+        }
+        @media (min-width: 1024px) {
+            .main-content {
+                flex-wrap: nowrap;
+            }
+            .ad-space-side {
+                display: block;
+            }
+        }
+        @media (max-width: 767px) {
+            .container {
+                padding: 20px;
+            }
+            select, input[type="file"], input[type="number"], input[type="range"] {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <a href="index.html">About</a>
+    </nav>
+    <!-- Top Ad (728x90) -->
+    <div class="ad-space-top">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-8442042587705069"
+             data-ad-slot="1234567890"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h1>Image Resizer - Resize Your Images</h1>
+            <h2>Choose a Size or Customize</h2>
+            <p>Resize your images quickly and for free. Select a predefined size or enter custom dimensions!</p>
+            <select id="sizeSelect" onchange="toggleCustomSize()">
+                <optgroup label="Icons and Favicons">
+                    <option value="16x16">16x16 (Favicon)</option>
+                    <option value="32x32">32x32 (Favicon)</option>
+                    <option value="192x192">192x192 (Icon)</option>
+                    <option value="512x512">512x512 (Icon)</option>
+                </optgroup>
+                <optgroup label="Social Media">
+                    <option value="1080x1080">1080x1080 (Instagram Post)</option>
+                    <option value="1080x1920">1080x1920 (Instagram Story)</option>
+                    <option value="1200x675">1200x675 (Twitter Post)</option>
+                    <option value="1200x630">1200x630 (Facebook Post)</option>
+                </optgroup>
+                <optgroup label="High Quality">
+                    <option value="1024x1024">1024x1024</option>
+                    <option value="2480x3508">2480x3508 (A4, 300 DPI)</option>
+                </optgroup>
+                <option value="custom">Custom</option>
+            </select>
+            <div class="custom-size" id="customSize">
+                <input type="number" id="customWidth" placeholder="Width (px)" min="1">
+                <input type="number" id="customHeight" placeholder="Height (px)" min="1">
+                <input type="checkbox" id="keepAspectRatio">
+                <label for="keepAspectRatio">Keep Aspect Ratio</label>
+            </div>
+            <select id="outputFormat">
+                <option value="image/jpeg">JPG</option>
+                <option value="image/png">PNG</option>
+                <option value="image/webp">WEBP</option>
+            </select>
+            <input type="range" id="quality" min="0" max="100" value="80">
+            <label for="quality">Quality: <span id="qualityValue">80</span>%</label>
+            <input type="file" id="fileInput" accept="image/jpeg,image/png" multiple>
+            <img id="preview" alt="Preview of the uploaded image">
+            <img id="resizedPreview" alt="Preview of the resized image">
+            <div id="output"></div>
+            <button id="resizeBtn" onclick="resizeImage()" disabled>Resize</button>
+            <p>Upload one or more images (JPG or PNG) and choose the size!</p>
+        </div>
+        <!-- Side Ad (160x600) -->
+        <div class="ad-space-side">
+            <ins class="adsbygoogle"
+                 style="display:block"
+                 data-ad-client="ca-pub-8442042587705069"
+                 data-ad-slot="0987654321"
+                 data-ad-format="auto"
+                 data-full-width-responsive="true"></ins>
+            <script>
+                 (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const sizeSelect = document.getElementById('sizeSelect');
+        const customSize = document.getElementById('customSize');
+        const customWidth = document.getElementById('customWidth');
+        const customHeight = document.getElementById('customHeight');
+        const keepAspectRatio = document.getElementById('keepAspectRatio');
+        const outputFormat = document.getElementById('outputFormat');
+        const quality = document.getElementById('quality');
+        const qualityValue = document.getElementById('qualityValue');
+        const preview = document.getElementById('preview');
+        const resizedPreview = document.getElementById('resizedPreview');
+        const output = document.getElementById('output');
+        const resizeBtn = document.getElementById('resizeBtn');
+
+        let originalAspectRatio = 1;
+
+        function toggleCustomSize() {
+            if (sizeSelect.value === 'custom') {
+                customSize.style.display = 'block';
+            } else {
+                customSize.style.display = 'none';
+                customWidth.value = '';
+                customHeight.value = '';
+            }
+        }
+
+        quality.addEventListener('input', () => {
+            qualityValue.textContent = quality.value;
+        });
+
+        fileInput.addEventListener('change', function() {
+            const files = this.files;
+            preview.style.display = 'none';
+            resizedPreview.style.display = 'none';
+            output.style.display = 'none';
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'image/jpeg' || file.type === 'image/png') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        resizeBtn.disabled = false;
+
+                        // Calculate aspect ratio for the first image
+                        const img = new Image();
+                        img.src = e.target.result;
+                        img.onload = function() {
+                            originalAspectRatio = img.width / img.height;
+                        };
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please select valid images (JPG or PNG).');
+                    resizeBtn.disabled = true;
+                }
+            } else {
+                resizeBtn.disabled = true;
+            }
+        });
+
+        customWidth.addEventListener('input', function() {
+            if (keepAspectRatio.checked && this.value) {
+                customHeight.value = Math.round(this.value / originalAspectRatio);
+            }
+        });
+
+        customHeight.addEventListener('input', function() {
+            if (keepAspectRatio.checked && this.value) {
+                customWidth.value = Math.round(this.value * originalAspectRatio);
+            }
+        });
+
+        function resizeImage() {
+            const files = fileInput.files;
+            if (!files.length) return;
+
+            let width, height;
+            if (sizeSelect.value === 'custom') {
+                width = parseInt(customWidth.value);
+                height = parseInt(customHeight.value);
+                if (!width || !height || width <= 0 || height <= 0) {
+                    alert('Please enter valid dimensions (greater than 0).');
+                    return;
+                }
+            } else {
+                [width, height] = sizeSelect.value.split('x').map(Number);
+            }
+
+            const zip = new JSZip();
+            let processed = 0;
+
+            Array.from(files).forEach((file, index) => {
+                if (file.type !== 'image/jpeg' && file.type !== 'image/png') {
+                    alert(`File ${file.name} is not a valid image (JPG or PNG). Skipping.`);
+                    processed++;
+                    if (processed === files.length) {
+                        finalizeZip(zip, width, height);
+                    }
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        const dataUrl = canvas.toDataURL(outputFormat.value, quality.value / 100);
+                        const base64 = dataUrl.split(',')[1];
+                        const extension = outputFormat.value.split('/')[1];
+                        zip.file(`resized_${width}x${height}_${index + 1}.${extension}`, base64, { base64: true });
+
+                        // Show preview of the first resized image
+                        if (index === 0) {
+                            resizedPreview.src = dataUrl;
+                            resizedPreview.style.display = 'block';
+                        }
+
+                        processed++;
+                        if (processed === files.length) {
+                            finalizeZip(zip, width, height);
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
+            });
+
+            output.innerHTML = '';
+            output.style.display = 'block';
+            output.textContent = 'Processing... Please wait for the ZIP download.';
+        }
+
+        function finalizeZip(zip, width, height) {
+            zip.generateAsync({ type: 'blob' }).then(function(content) {
+                saveAs(content, `resized_images_${width}x${height}.zip`);
+                output.textContent = `Download complete! Your images have been resized to ${width}x${height}.`;
+            });
+        }
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered!', reg))
+                    .catch(err => console.log('Error registering Service Worker:', err));
+            });
+        }
+    </script>
+</body>
+</html>

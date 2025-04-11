@@ -1,4 +1,4 @@
-const CACHE_NAME = 'image-resizer-cache-v1';
+const CACHE_NAME = 'image-resizer-cache-v4';
 const urlsToCache = [
     '/',
     '/index.html',
